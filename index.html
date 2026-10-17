@@ -20,7 +20,7 @@
         .scanner-beam { transform-origin: 450px 300px; animation: sweep 12s infinite linear; stroke: #10b981; stroke-width: 0.5; filter: drop-shadow(0 0 4px #10b981); }
         
         /* Panel boczny OSIRIS */
-        .dashboard { position: absolute; top: 70px; left: 20px; width: 390px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .dashboard { position: absolute; top: 70px; left: 20px; width: 390px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.3s ease, opacity 0.3s ease; }
         .dashboard.hidden { transform: translateX(-430px); opacity: 0; pointer-events: none; }
         
         /* Hakerski przycisk główny */
@@ -145,7 +145,7 @@
                 <line x1="675" y1="0" x2="675" y2="600" />
             </g>
 
-            <!-- Uproszczone geometryczne kontury kontynentów świata -->
+            <!-- Geometryczne kontury kontynentów świata -->
             <g class="world-map">
                 <!-- Ameryka Północna -->
                 <polygon points="100,100 280,120 250,280 180,250 150,300 120,250 70,180" />
@@ -165,4 +165,4 @@
             <line x1="450" y1="300" x2="450" y2="10" class="scanner-beam" />
 
             <!-- INTERAKTYWNE IKONY SEKTORÓW (Węzły na mapie) -->
-            
+            <g class="sector-node" onclick="triggerSector('sect-baltic')" transform="translate(460, 160)">
