@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moja Sieć Fabryka - Panel OSINT</title>
+    <title>Moja Sieć Fabryka - Panel OSINT Live</title>
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05070f; font-family: 'Courier New', monospace; color: #fff; overflow: hidden; display: flex; }
         
@@ -17,19 +17,24 @@
             50% { opacity: 0.4; }
             100% { transform: rotate(360deg); opacity: 0.8; }
         }
-        .scanner-line { transform-origin: 100px 100px; animation: radar-sweep 6s infinite linear; stroke: #38bdf8; stroke-width: 0.8; }
+        .scanner-line { transform-origin: 100px 100px; animation: radar-sweep 8s infinite linear; stroke: #38bdf8; stroke-width: 0.8; }
         
         /* Panel boczny w stylu konsoli wywiadowczej */
-        .dashboard { position: absolute; top: 20px; left: 20px; width: 340px; background: rgba(5, 7, 15, 0.95); border: 1px solid #0ea5e9; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); box-sizing: border-box; }
+        .dashboard { position: absolute; top: 20px; left: 20px; width: 360px; background: rgba(5, 7, 15, 0.95); border: 1px solid #0ea5e9; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); box-sizing: border-box; }
         h1 { font-size: 1.1rem; margin: 0 0 5px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); }
-        .subtitle { font-size: 0.75rem; color: #64748b; margin: 0 0 20px 0; text-transform: uppercase; }
+        .subtitle { font-size: 0.72rem; color: #64748b; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; }
         
         /* Kontener na wpisy krytyczne */
-        .alerts-container { max-height: 70vh; overflow-y: auto; }
-        .alert-card { padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-left: 4px solid #ef4444; font-size: 0.8rem; border-radius: 4px; margin-bottom: 12px; line-height: 1.4; }
+        .alerts-container { max-height: 80vh; overflow-y: auto; padding-right: 5px; }
+        .alert-card { padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-left: 4px solid #ef4444; font-size: 0.75rem; border-radius: 4px; margin-bottom: 10px; line-height: 1.4; }
         .alert-card.warning { border-left-color: #f59e0b; }
+        .alert-card.info { border-left-color: #38bdf8; }
         .alert-time { font-size: 0.65rem; color: #38bdf8; display: block; margin-bottom: 4px; font-weight: bold; }
-        .alert-geo { font-size: 0.65rem; color: #64748b; display: block; margin-top: 6px; text-align: right; text-transform: uppercase; }
+        .alert-geo { font-size: 0.65rem; color: #64748b; display: block; margin-top: 6px; text-align: right; text-transform: uppercase; font-weight: bold; }
+        
+        /* Stylizacja paska przewijania */
+        .alerts-container::-webkit-scrollbar { width: 4px; }
+        .alerts-container::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -37,22 +42,46 @@
     <!-- Panel boczny OSIRIS OSINT -->
     <div class="dashboard">
         <h1>Moja Sieć Fabryka</h1>
-        <div class="subtitle">KANAŁ INFORMACJI KRYTYCZNYCH</div>
+        <div class="subtitle">BIEŻĄCY BIULETYN OSINT - PAŹDZIERNIK 2026</div>
         
         <div class="alerts-container">
-            <!-- Wpis krytyczny 1 -->
+            <!-- Alert 1 -->
             <div class="alert-card">
-                <span class="alert-time">[ALERT KRYTYCZNY]</span>
-                <strong>Wykryto zdarzenie geopolityczne</strong><br>
-                Zgłoszenie awarii systemów przesyłowych. Monitorowanie strefy przygranicznej aktywne.
-                <span class="alert-geo">Lokalizacja: Global / Live</span>
+                <span class="alert-time">[ALERT: ENERGIA / HANDEL MORSKI]</span>
+                <strong>Eskalacja w Cieśninie Ormuz</strong><br>
+                Zgłoszono zatonięcie dwóch statków handlowych w wyniku ostrzału pociskami. Ponad 50 irańskich tankowców objętych restrykcjami przez blokadę USA. Ruch morski w regionie sparaliżowany.
+                <span class="alert-geo">Region: Cieśnina Ormuz / Zatoka Perska</span>
             </div>
             
-            <!-- Wpis krytyczny 2 -->
+            <!-- Alert 2 -->
+            <div class="alert-card">
+                <span class="alert-time">[ALERT: RYNEK PALIW]</span>
+                <strong>Ropa Brent przekracza $110</strong><br>
+                Ceny ropy naftowej Brent osiągnęły barierę 110 dolarów za baryłkę po raz pierwszy od wielu miesięcy. Inwestorzy masowo wyceniają ryzyko rozszerzenia konfliktu na Bliskim Wschodzie.
+                <span class="alert-geo">Sektor: Rynki Globalne</span>
+            </div>
+            
+            <!-- Alert 3 -->
             <div class="alert-card warning">
-                <span class="alert-time">[STATUS SIECI]</span>
-                <strong>Węzeł Gdynia: Działanie stabilne</strong><br>
-                Główny punkt dowodzenia pomyślnie zsynchronizowany z satelitą wektorową. Brak zakłóceń lokalnych.
+                <span class="alert-time">[ZAGROŻENIE: INFRASTRUKTURA]</span>
+                <strong>Ataki rakietowe na lotnisko w Rijadzie</strong><br>
+                Pociski balistyczne wystrzelone przez Huti uderzyły w rejon międzynarodowego lotniska King Khalid. Oficjalne raporty potwierdzają ofiary śmiertelne oraz zawieszenie rejsów cywilnych.
+                <span class="alert-geo">Cel: Rijad, Arabia Saudyjska</span>
+            </div>
+            
+            <!-- Alert 4 -->
+            <div class="alert-card info">
+                <span class="alert-time">[KOMUNIKAT: GEOPOLITYKA]</span>
+                <strong>Sankcje Unii Europejskiej</strong><br>
+                Ministrowie spraw zagranicznych UE zatwierdzili największy pakiet restrykcji i sankcji gospodarczych od początku 2022 roku, wymierzony w sieci hybrydowych powiązań militarnych.
+                <span class="alert-geo">Sektor: Bruksela, UE</span>
+            </div>
+
+            <!-- Alert 5 -->
+            <div class="alert-card info">
+                <span class="alert-time">[STATUS: PUNKTY WŁASNE]</span>
+                <strong>Węzeł Fabryka Gdynia</strong><br>
+                System nadzoru i łączności satelitarnej w porcie Gdynia działa w trybie pełnej gotowości. Brak zakłóceń w rejonie Morza Bałtyckiego.
                 <span class="alert-geo">Węzeł: Gdynia, PL</span>
             </div>
         </div>
