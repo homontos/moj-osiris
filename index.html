@@ -7,7 +7,7 @@
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
         
-        /* Czysty, pancerny element iframe rozciągnięty na cały ekran */
+        /* Czysta, pancerna mapa Google na cały ekran */
         iframe { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 1; }
         
         /* Panel boczny w stylu OSIRIS */
@@ -19,10 +19,10 @@
 </head>
 <body>
 
-    <!-- Panel boczny nakładany na mapę -->
+    <!-- Panel boczny Osiris -->
     <div class="dashboard-overlay">
         <h1>Moja Sieć Fabryka</h1>
-        <p>System wizualizacji danych (v4)</p>
+        <p>System wizualizacji danych (Google Maps V5)</p>
         <div id="custom-points-list">
             <div class="data-item">
                 <strong>Fabryka Gdynia</strong><br>Główny węzeł sieci i punkt dowodzenia.
@@ -30,9 +30,9 @@
         </div>
     </div>
 
-    <!-- Osadzona, oficjalna mapa OpenStreetMap wycelowana bezpośrednio na Gdynię z markerem -->
+    <!-- Oficjalny podkład mapowy Google Maps satelitarny wycelowany na Gdynię -->
     <iframe 
-        src="https://openstreetmap.org">
+        src="https://google.com">
     </iframe>
 
 </body>
