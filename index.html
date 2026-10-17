@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moja Sieć Fabryka</title>
-    <!-- Korzystamy ze sprawdzonej, stabilnej wersji biblioteki Open-Source -->
+    <!-- Stabilna wersja biblioteki MapLibre -->
     <script src="https://unpkg.com"></script>
     <link href="https://unpkg.com" rel="stylesheet" />
     <style>
-        body { margin: 0; padding: 0; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        /* Kluczowa poprawka: Mapa musi zajmować 100% wysokości i szerokości ekranu */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
+        #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        /* Panel boczny w stylu OSIRIS */
         .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 320px; background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         h1 { font-size: 1.2rem; margin: 0 0 10px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
         p { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; }
@@ -28,45 +31,28 @@
         </div>
     </div>
 
+    <!-- Kontener na mapę -->
     <div id="map"></div>
 
     <script>
-        // Darmowy, publiczny styl mapy bez wymogu posiadania tokenów/kluczy API
-        const darmowyStyl = {
-            "version": 8,
-            "sources": {
-                "open-tiles": {
-                    "type": "raster",
-                    "tiles": ["https://openstreetmap.org{z}/{x}/{y}.png"],
-                    "tileSize": 256,
-                    "attribution": "© OpenStreetMap contributors"
-                }
-            },
-            "layers": [
-                {
-                    "id": "open-layer",
-                    "type": "raster",
-                    "source": "open-tiles",
-                    "minzoom": 0,
-                    "maxzoom": 19
-                }
-            ]
-        };
+        // Darmowy, profesjonalny styl ciemny (Dark Mode) bez wymogu kluczy API
+        const ciemnyStyl = 'https://openfreemap.org';
 
-        // Tworzenie mapy
+        // Inicjalizacja mapy wyśrodkowanej na Gdynię
         const map = new maplibreGl.Map({
             container: 'map',
-            style: darmowyStyl,
-            center: [18.5305, 54.5189], // Współrzędne Gdyni
-            zoom: 11
+            style: ciemnyStyl,
+            center: [18.5305, 54.5189], // Współrzędne geograficzne Gdyni
+            zoom: 12
         });
 
+        // Kontrolki nawigacji (zoom)
         map.addControl(new maplibreGl.NavigationControl(), 'top-right');
 
-        // Dodanie niebieskiego punktu w Gdyni od razu po załadowaniu
+        // Umieszczenie błękitnego znacznika w Gdyni po załadowaniu podkładu mapowego
         map.on('load', () => {
             const popup = new maplibreGl.Popup({ offset: 25 })
-                .setHTML('<h3 style="color:#000; margin:0;">Fabryka Gdynia</h3><p style="color:#334155; margin:5px 0 0 0;">Punkt dowodzenia.</p>');
+                .setHTML('<h3 style="color:#0b0f19; margin:0 0 5px 0;">Fabryka Gdynia</h3><p style="color:#475569; margin:0; font-size:13px;">Główny punkt sieci.</p>');
 
             new maplibreGl.Marker({ color: '#38bdf8' })
                 .setLngLat([18.5305, 54.5189])
