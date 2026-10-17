@@ -5,16 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moja Sieć Fabryka</title>
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         
-        /* Czysta, pancerna mapa Google na cały ekran */
-        iframe { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 1; }
+        /* Kontener na nasz cyber-globus */
+        .map-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b 0%, #0b0f19 70%); }
+        
+        /* Styl wektorowego globu */
+        .cyber-globe { width: 600px; height: 600px; max-width: 90vw; max-height: 90vh; }
         
         /* Panel boczny w stylu OSIRIS */
-        .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 320px; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); pointer-events: none; }
+        .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 320px; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         h1 { font-size: 1.2rem; margin: 0 0 10px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
         p { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; }
         .data-item { padding: 8px 12px; background: rgba(30, 41, 59, 0.8); border-left: 3px solid #38bdf8; font-size: 0.8rem; border-radius: 4px; }
+        
+        /* Animacja pulsującego radaru dla Gdyni */
+        @keyframes radar-pulse {
+            0% { r: 6; opacity: 1; }
+            100% { r: 25; opacity: 0; }
+        }
+        .pulse { animation: radar-pulse 2s infinite linear; fill: none; stroke: #38bdf8; stroke-width: 2; }
     </style>
 </head>
 <body>
@@ -22,18 +32,38 @@
     <!-- Panel boczny Osiris -->
     <div class="dashboard-overlay">
         <h1>Moja Sieć Fabryka</h1>
-        <p>System wizualizacji danych (Google Maps V5)</p>
+        <p>System wizualizacji danych (Wektor V6)</p>
         <div id="custom-points-list">
             <div class="data-item">
-                <strong>Fabryka Gdynia</strong><br>Główny węzeł sieci i punkt dowodzenia.
+                <strong>Fabryka Gdynia</strong><br>Główny węzeł sieci i punkt dowodzenia.<br><span style="color:#22c55e;">● Status: AKTYWNY</span>
             </div>
         </div>
     </div>
 
-    <!-- Oficjalny podkład mapowy Google Maps satelitarny wycelowany na Gdynię -->
-    <iframe 
-        src="https://google.com">
-    </iframe>
+    <!-- Wektory generowane w 100% lokalnie w przeglądarce - brak pobierania zewnętrznych map -->
+    <div class="map-container">
+        <svg class="cyber-globe" viewBox="0 0 200 200">
+            <!-- Siatka współrzędnych globu (Siatka maskująca) -->
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#1e293b" stroke-width="1" />
+            <path d="M 20 100 Q 100 40 180 100" fill="none" stroke="#1e293b" stroke-width="0.5" />
+            <path d="M 20 100 Q 100 160 180 100" fill="none" stroke="#1e293b" stroke-width="0.5" />
+            <line x1="20" y1="100" x2="180" y2="100" stroke="#1e293b" stroke-width="0.5" />
+            <line x1="100" y1="20" x2="100" y2="180" stroke="#1e293b" stroke-width="0.5" />
+            
+            <!-- Uproszczone zarysy kontynentów narysowane bezpośrednio w kodzie -->
+            <path d="M 70 60 Q 90 50 110 55 T 140 70 T 130 110 T 90 120 Z" fill="#1e293b" opacity="0.4" stroke="#334155" stroke-width="0.5" />
+            
+            <!-- Główny Węzeł sieci: Gdynia -->
+            <!-- Pulsujący pierścień radaru -->
+            <circle cx="100" cy="75" r="10" class="pulse" />
+            <!-- Stały świecący punkt węzła -->
+            <circle cx="100" cy="75" r="5" fill="#38bdf8" filter="drop-shadow(0px 0px 4px #38bdf8)" />
+            
+            <!-- Linie połączeń sieciowych wychodzące z Gdyni -->
+            <path d="M 100 75 Q 80 90 60 110" fill="none" stroke="#38bdf8" stroke-dasharray="2 2" opacity="0.5" />
+            <path d="M 100 75 Q 120 90 140 105" fill="none" stroke="#38bdf8" stroke-dasharray="2 2" opacity="0.5" />
+        </svg>
+    </div>
 
 </body>
 </html>
