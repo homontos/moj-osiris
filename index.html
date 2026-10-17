@@ -3,45 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moja Sieć Fabryka - LiveUAMap OSINT</title>
+    <title>Moja Sieć Fabryka - Panel OSINT</title>
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05070f; font-family: 'Courier New', monospace; color: #fff; overflow: hidden; display: flex; }
         
-        /* Ramka z mapą LiveUAMap rozciągnięta na cały ekran */
-        iframe { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 1; }
+        /* Ekran główny z animacją radaru i globu */
+        .main-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #0f172a 0%, #05070f 80%); }
+        .grid-globe { width: 500px; height: 500px; max-width: 80vw; }
         
-        /* Futurystyczny panel boczny w stylu OSIRIS nałożony nad mapę */
-        .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 330px; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); pointer-events: none; }
-        h1 { font-size: 1.2rem; margin: 0 0 5px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
-        .status-pulse { display: inline-block; width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 8px #22c55e; }
-        p { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; }
-        .data-item { padding: 10px 12px; background: rgba(30, 41, 59, 0.8); border-left: 3px solid #ef4444; font-size: 0.8rem; border-radius: 4px; margin-bottom: 8px; }
-        .location-tag { font-size: 0.7rem; color: #38bdf8; text-transform: uppercase; font-weight: bold; display: block; margin-top: 5px; }
+        /* Animacja linii skanującej radar */
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); opacity: 0.8; }
+            50% { opacity: 0.4; }
+            100% { transform: rotate(360deg); opacity: 0.8; }
+        }
+        .scanner-line { transform-origin: 100px 100px; animation: radar-sweep 6s infinite linear; stroke: #38bdf8; stroke-width: 0.8; }
+        
+        /* Panel boczny w stylu konsoli wywiadowczej */
+        .dashboard { position: absolute; top: 20px; left: 20px; width: 340px; background: rgba(5, 7, 15, 0.95); border: 1px solid #0ea5e9; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); box-sizing: border-box; }
+        h1 { font-size: 1.1rem; margin: 0 0 5px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); }
+        .subtitle { font-size: 0.75rem; color: #64748b; margin: 0 0 20px 0; text-transform: uppercase; }
+        
+        /* Kontener na wpisy krytyczne */
+        .alerts-container { max-height: 70vh; overflow-y: auto; }
+        .alert-card { padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-left: 4px solid #ef4444; font-size: 0.8rem; border-radius: 4px; margin-bottom: 12px; line-height: 1.4; }
+        .alert-card.warning { border-left-color: #f59e0b; }
+        .alert-time { font-size: 0.65rem; color: #38bdf8; display: block; margin-bottom: 4px; font-weight: bold; }
+        .alert-geo { font-size: 0.65rem; color: #64748b; display: block; margin-top: 6px; text-align: right; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <!-- Panel boczny Osiris -->
-    <div class="dashboard-overlay">
+    <!-- Panel boczny OSIRIS OSINT -->
+    <div class="dashboard">
         <h1>Moja Sieć Fabryka</h1>
-        <p><span class="status-pulse"></span>Kanał Informacji Krytycznych (OSINT)</p>
+        <div class="subtitle">KANAŁ INFORMACJI KRYTYCZNYCH</div>
         
-        <div id="custom-points-list">
-            <div class="data-item">
-                <strong>Główny punkt sieci</strong><br>Węzeł kontrolny monitoruje globalne zdarzenia LiveUAMap.
-                <span class="location-tag">Baza: Gdynia</span>
+        <div class="alerts-container">
+            <!-- Wpis krytyczny 1 -->
+            <div class="alert-card">
+                <span class="alert-time">[ALERT KRYTYCZNY]</span>
+                <strong>Wykryto zdarzenie geopolityczne</strong><br>
+                Zgłoszenie awarii systemów przesyłowych. Monitorowanie strefy przygranicznej aktywne.
+                <span class="alert-geo">Lokalizacja: Global / Live</span>
             </div>
-            <div class="data-item" style="border-left-color: #f59e0b;">
-                <strong>Źródło LiveUAMap</strong><br>Poniższa mapa pobiera oraz centruje krytyczne raporty geopolityczne w czasie rzeczywistym.
-                <span class="location-tag">Status: Połączono z Satelitą</span>
+            
+            <!-- Wpis krytyczny 2 -->
+            <div class="alert-card warning">
+                <span class="alert-time">[STATUS SIECI]</span>
+                <strong>Węzeł Gdynia: Działanie stabilne</strong><br>
+                Główny punkt dowodzenia pomyślnie zsynchronizowany z satelitą wektorową. Brak zakłóceń lokalnych.
+                <span class="alert-geo">Węzeł: Gdynia, PL</span>
             </div>
         </div>
     </div>
 
-    <!-- Integracja z oficjalną globalną ramką LiveUAMap -->
-    <iframe 
-        src="https://liveuamap.com/frame">
-    </iframe>
+    <!-- Niezależny, generowany lokalnie globus radarowy -->
+    <div class="main-screen">
+        <svg class="grid-globe" viewBox="0 0 200 200">
+            <!-- Okręgi radaru -->
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#1e293b" stroke-width="0.5" />
+            <circle cx="100" cy="100" r="60" fill="none" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="2 2" />
+            <circle cx="100" cy="100" r="40" fill="none" stroke="#1e293b" stroke-width="0.5" />
+            <circle cx="100" cy="100" r="20" fill="none" stroke="#1e293b" stroke-width="0.5" />
+            
+            <!-- Linie osiowe -->
+            <line x1="20" y1="100" x2="180" y2="100" stroke="#1e293b" stroke-width="0.5" />
+            <line x1="100" y1="20" x2="100" y2="180" stroke="#1e293b" stroke-width="0.5" />
+            
+            <!-- Sztuczne zarysy kontynentów (bezpieczne wektory) -->
+            <path d="M 60 70 Q 80 50 110 60 T 150 80 T 120 120 Z" fill="#0f172a" stroke="#0ea5e9" stroke-width="0.5" opacity="0.6" />
+            
+            <!-- Linia skanera radarowego -->
+            <line x1="100" y1="100" x2="100" y2="20" class="scanner-line" />
+            
+            <!-- Świecący punkt Gdynia -->
+            <circle cx="100" cy="75" r="4" fill="#38bdf8" filter="drop-shadow(0px 0px 4px #38bdf8)" />
+        </svg>
+    </div>
 
 </body>
 </html>
