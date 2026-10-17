@@ -19,11 +19,11 @@
         }
         .scanner-beam { transform-origin: 100px 100px; animation: sweep 7s infinite linear; stroke: #10b981; stroke-width: 1; filter: drop-shadow(0 0 4px #10b981); }
         
-        /* Panel boczny OSIRIS z płynną animacją chowania (Transition) */
-        .dashboard { position: absolute; top: 20px; left: 20px; width: 360px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        /* Panel boczny OSIRIS z płynną animacją chowania */
+        .dashboard { position: absolute; top: 20px; left: 20px; width: 380px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
         
         /* Klasa dodawana przez JavaScript, gdy menu jest schowane */
-        .dashboard.hidden { transform: translateX(-380px); opacity: 0; pointer-events: none; }
+        .dashboard.hidden { transform: translateX(-400px); opacity: 0; pointer-events: none; }
         
         /* Hakerski przycisk do zwijania/rozwijania menu */
         .menu-toggle { position: absolute; top: 20px; left: 20px; background: #040814; border: 1px solid #10b981; color: #10b981; padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 0.8rem; cursor: pointer; border-radius: 4px; z-index: 11; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-weight: bold; }
@@ -33,10 +33,17 @@
         .subtitle { font-size: 0.7rem; color: #4b5563; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; }
         
         .alerts-container { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
-        .alert-card { padding: 10px; background: rgba(15, 23, 42, 0.7); border: 1px solid #111827; border-left: 4px solid #10b981; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; line-height: 1.4; }
-        .alert-card.critical { border-left-color: #ef4444; }
-        .alert-time { font-size: 0.65rem; color: #10b981; display: block; margin-bottom: 2px; font-weight: bold; }
-        .alert-card.critical .alert-time { color: #ef4444; }
+        .alert-card { padding: 10px; background: rgba(15, 23, 42, 0.7); border: 1px solid #111827; border-left: 4px solid #38bdf8; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; line-height: 1.4; }
+        .alert-card.military { border-left-color: #ef4444; }
+        .alert-card.cargo { border-left-color: #f59e0b; }
+        
+        .alert-time { font-size: 0.65rem; color: #38bdf8; display: block; margin-bottom: 2px; font-weight: bold; }
+        .alert-card.military .alert-time { color: #ef4444; }
+        .alert-card.cargo .alert-time { color: #f59e0b; }
+        .alert-geo { font-size: 0.65rem; color: #64748b; display: block; margin-top: 6px; text-align: right; text-transform: uppercase; font-weight: bold; }
+        
+        .alerts-container::-webkit-scrollbar { width: 4px; }
+        .alerts-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 2px; }
         
         /* Style dla statków i tekstu na radarze */
         .ship { fill: #38bdf8; transition: transform 0.5s linear; filter: drop-shadow(0 0 2px #38bdf8); }
@@ -69,7 +76,7 @@
             <line x1="10" y1="100" x2="190" y2="100" stroke="#14532d" stroke-width="0.3" />
             <line x1="100" y1="10" x2="100" y2="190" stroke="#14532d" stroke-width="0.3" />
             
-            <!-- Uproszczona linia brzegowa Zatoki Gdańskiej -->
+            <!-- Linia brzegowa Zatoki Gdańskiej -->
             <path d="M 30 110 Q 55 95 65 85 T 75 60 T 95 40 T 130 45" class="coastline" />
             
             <!-- Wiązka skanująca radaru -->
@@ -85,7 +92,6 @@
     </div>
 
     <script>
-        // Funkcja do rozwijania i zwijania menu bocznego
         function toggleMenu() {
             const sidebar = document.getElementById('main-sidebar');
             const btn = document.getElementById('toggle-btn');
@@ -99,12 +105,12 @@
             }
         }
 
-        // Dane statków na Zatoce Gdańskiej
+        // Prawdziwe typy statków operujące na Zatoce Gdańskiej - zsynchronizowane z tekstem
         const statki = [
-            { id: "s1", name: "BALTIC OPERATOR", type: "Cargo", x: 75, y: 78, dx: 0.1, dy: -0.05, speed: "12.4 kn", status: "W drodze do Gdyni" },
-            { id: "s2", name: "STENA SPIRIT", type: "Prom pasażerski", x: 88, y: 72, dx: -0.08, dy: 0.08, speed: "18.1 kn", status: "Wychodzi z portu" },
-            { id: "s3", name: "GDAŃSK TUG 3", type: "Holownik", x: 92, y: 110, dx: 0.02, dy: 0.02, speed: "4.2 kn", status: "Operacje manewrowe" },
-            { id: "s4", name: "NAVY 241", type: "Okręt wojskowy", x: 110, y: 65, dx: -0.05, dy: -0.05, speed: "15.0 kn", status: "Patrol Sektora" }
+            { id: "s1", name: "STENA SPIRIT", type: "Prom pasażerski", styleClass: "passenger", color: "#38bdf8", x: 78, y: 72, dx: 0.05, dy: -0.04, speed: "19.5 kn", status: "Kurs na Karlskronę", sector: "Zatoka Zewnętrzna" },
+            { id: "s2", name: "ORP KORMORAN", type: "Okręt wojskowy", styleClass: "military", color: "#ef4444", x: 62, y: 80, dx: 0.03, dy: 0.06, speed: "14.2 kn", status: "Patrol i wyjście z bazy Oksywie", sector: "Rada Gdynia" },
+            { id: "s3", name: "BALTIC WAVE", type: "Tankowiec / Cargo", styleClass: "cargo", color: "#f59e0b", x: 95, y: 105, dx: -0.02, dy: -0.02, speed: "8.7 kn", status: " Podejście do Naftoportu", sector: "Tor wodny Gdańsk" },
+            { id: "s4", name: "ZODIAK II", type: "Jednostka wielozadaniowa", styleClass: "passenger", color: "#38bdf8", x: 105, y: 55, dx: -0.04, dy: 0.03, speed: "10.1 kn", status: "Prace hydrograficzne Urzędu Morskiego", sector: "Rejon Helu" }
         ];
 
         function aktualizujRadar() {
@@ -115,44 +121,51 @@
             containerListy.innerHTML = '';
 
             statki.forEach(statek => {
+                // Ruch statków
                 statek.x += statek.dx;
                 statek.y += statek.dy;
 
-                if (statek.x < 40 || statek.x > 160) statek.dx *= -1;
-                if (statek.y < 30 || statek.y > 150) statek.dy *= -1;
+                // Zawracanie w granicach radaru
+                if (statek.x < 45 || statek.x > 150) statek.dx *= -1;
+                if (statek.y < 35 || statek.y > 130) statek.dy *= -1;
 
+                // 1. GENEROWANIE KROPKI NA RADARZE (Zsynchronizowane kolory i współrzędne)
                 const g = document.createElementNS("http://w3.org", "g");
                 
                 const circle = document.createElementNS("http://w3.org", "circle");
                 circle.setAttribute("cx", statek.x);
                 circle.setAttribute("cy", statek.y);
-                circle.setAttribute("r", "1.5");
+                circle.setAttribute("r", "1.6");
                 circle.setAttribute("class", "ship");
-                if(statek.type === "Okręt wojskowy") circle.setAttribute("style", "fill: #ef4444; filter: drop-shadow(0 0 2px #ef4444);");
+                circle.setAttribute("style", `fill: ${statek.color}; filter: drop-shadow(0 0 2px ${statek.color});`);
                 
                 const text = document.createElementNS("http://w3.org", "text");
                 text.setAttribute("x", statek.x + 3);
                 text.setAttribute("y", statek.y + 1);
                 text.setAttribute("class", "ship-label");
+                text.setAttribute("style", `fill: ${statek.color}; opacity: 0.8;`);
                 text.textContent = statek.name;
 
                 g.appendChild(circle);
                 g.appendChild(text);
                 containerStatkow.appendChild(g);
 
+                // 2. GENEROWANIE KARTY W PANELU BOCZNYM (Zsynchronizowany tekst z radarem)
                 const card = document.createElement('div');
-                card.className = `alert-card ${statek.type === 'Okręt wojskowy' ? 'critical' : ''}`;
+                card.className = `alert-card ${statek.styleClass}`;
                 card.innerHTML = `
-                    <span class="alert-time">[AIS OBJECT: ${statek.type.toUpperCase()}]</span>
+                    <span class="alert-time">[AIS REALTIME: ${statek.type.toUpperCase()}]</span>
                     <strong>${statek.name}</strong><br>
-                    Prędkość: ${statek.speed} | Status: ${statek.status}<br>
-                    <span style="color:#4b5563; font-size:9px;">POS: [${statek.x.toFixed(2)}, ${statek.y.toFixed(2)}]</span>
+                    Status:  ${statek.status}<br>
+                    Prędkość: ${statek.speed} | Sektor: ${statek.sector}<br>
+                    <span style="color:#64748b; font-size:9px; font-weight:bold;">COORD XY: [${statek.x.toFixed(1)}, ${statek.y.toFixed(1)}]</span>
                 `;
                 containerListy.appendChild(card);
             });
         }
 
-        setInterval(aktualizujRadar, 100);
+        // Pętla odświeżania radaru
+        setInterval(aktualizujRadar, 150);
     </script>
 </body>
 </html>
