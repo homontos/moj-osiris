@@ -7,31 +7,31 @@
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05070f; font-family: 'Courier New', monospace; color: #fff; overflow: hidden; display: flex; }
         
-        /* Ekran radaru wojskowego */
+        /* Ekran mapy i radaru globalnego */
         .radar-screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #091124 0%, #040814 90%); }
-        .radar-svg { width: 700px; height: 700px; max-width: 95vw; max-height: 95vh; }
+        .radar-svg { width: 900px; height: 600px; max-width: 95vw; max-height: 95vh; }
         
         /* Animacja wiązki skanującej */
         @keyframes sweep {
-            0% { transform: rotate(0deg); opacity: 0.6; }
-            50% { opacity: 0.2; }
-            100% { transform: rotate(360deg); opacity: 0.6; }
+            0% { transform: rotate(0deg); opacity: 0.4; }
+            50% { opacity: 0.1; }
+            100% { transform: rotate(360deg); opacity: 0.4; }
         }
-        .scanner-beam { transform-origin: 100px 100px; animation: sweep 7s infinite linear; stroke: #10b981; stroke-width: 1; filter: drop-shadow(0 0 4px #10b981); }
+        .scanner-beam { transform-origin: 450px 300px; animation: sweep 12s infinite linear; stroke: #10b981; stroke-width: 0.5; filter: drop-shadow(0 0 4px #10b981); }
         
-        /* Panel boczny OSIRIS z płynną animacją chowania */
-        .dashboard { position: absolute; top: 20px; left: 20px; width: 390px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
-        .dashboard.hidden { transform: translateX(-420px); opacity: 0; pointer-events: none; }
+        /* Panel boczny OSIRIS */
+        .dashboard { position: absolute; top: 70px; left: 20px; width: 390px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .dashboard.hidden { transform: translateX(-430px); opacity: 0; pointer-events: none; }
         
         /* Hakerski przycisk główny */
         .menu-toggle { position: absolute; top: 20px; left: 20px; background: #040814; border: 1px solid #10b981; color: #10b981; padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 0.8rem; cursor: pointer; border-radius: 4px; z-index: 11; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-weight: bold; }
-        .menu-toggle:hover { background: #10b981; color: #040414; }
+        .menu-toggle:hover { background: #10b981; color: #040814; }
         
-        h1 { font-size: 1.1rem; margin: 0 40px 5px 0; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+        h1 { font-size: 1.1rem; margin: 0 0 5px 0; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
         .subtitle { font-size: 0.7rem; color: #4b5563; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; }
         
         /* Kontener na harmonijkę menu */
-        .accordion-container { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
+        .accordion-container { max-height: 70vh; overflow-y: auto; padding-right: 5px; }
         .accordion-container::-webkit-scrollbar { width: 4px; }
         .accordion-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 2px; }
         
@@ -51,11 +51,19 @@
         .alert-card.military .alert-time { color: #ef4444; }
         .alert-card.cargo .alert-time { color: #f59e0b; }
         
-        /* Elementy wektorowe radaru */
-        .ship { fill: #38bdf8; transition: transform 0.5s linear; filter: drop-shadow(0 0 2px #38bdf8); }
-        .ship.military-vessel { fill: #ef4444; filter: drop-shadow(0 0 2px #ef4444); }
-        .ship-label { fill: #94a3b8; font-size: 3px; font-family: sans-serif; font-weight: bold; }
-        .coastline { fill: none; stroke: #1e293b; stroke-width: 1.5; stroke-dasharray: 4 2; }
+        /* Elementy wektorowe mapy świata */
+        .world-map { fill: #0b1329; stroke: #1e293b; stroke-width: 0.8; }
+        .grid-lines { fill: none; stroke: #111827; stroke-width: 0.5; stroke-dasharray: 2 4; }
+        
+        /* Styl pulsujących ikon sektorów na mapie */
+        .sector-node { cursor: pointer; }
+        .sector-ping { fill: none; stroke-width: 1; opacity: 0; transform-origin: center; animation: ping 2s infinite ease-out; }
+        .sector-node:hover .sector-center { fill: #fff; filter: drop-shadow(0 0 8px #fff); }
+        
+        @keyframes ping {
+            0% { r: 2px; opacity: 0.8; }
+            100% { r: 15px; opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -64,39 +72,48 @@
     <button class="menu-toggle" id="toggle-btn" onclick="toggleMenu()">[ UKRYJ MENU ]</button>
 
     <!-- Panel boczny OSIRIS -->
-    <div class="dashboard" id="main-sidebar" style="margin-top: 50px;">
+    <div class="dashboard" id="main-sidebar">
         <h1>Moja Sieć Fabryka</h1>
         <div class="subtitle">KONSOLA OPERACYJNA OSINT Live</div>
         
         <div class="accordion-container">
             
-            <!-- SEKCJA 1: ZATOKA GDAŃSKA (Dynamiczna z radaru) -->
-            <div class="accordion-header" onclick="toggleSection('sect-baltic', this)">
-                <span>🌐 Sektor: Zatoka Gdańska (AIS)</span><span>[+]</span>
+            <!-- SEKCJA 1: BALTYK -->
+            <div class="accordion-header" id="head-sect-baltic" onclick="toggleSection('sect-baltic', this)">
+                <span>🌐 Sektor: Morze Bałtyckie</span><span>[+]</span>
             </div>
             <div class="accordion-content" id="sect-baltic">
-                <div id="live-ais-list"><!-- Generowane automatycznie przez skrypt JS --></div>
+                <div class="alert-card">
+                    <span class="alert-time">[HQ BASE GDYNIA]</span>
+                    <strong>Węzeł Fabryka operacyjny</strong><br>
+                    Nasłuch radiowy oraz systemy optoelektroniczne w porcie Gdynia zorientowane na monitoring Morza Bałtyckiego działają bez zakłóceń.
+                </div>
+                <div class="alert-card military">
+                    <span class="alert-time">[MILITARY ALERT]</span>
+                    <strong>Podniesienie gotowości OPL</strong><br>
+                    Polskie oraz sojusznicze myśliwce poderwane w rejonie strefy przygranicznej w związku z rakietową aktywnością w sąsiednich sektorach.
+                </div>
             </div>
             
             <!-- SEKCJA 2: CIEŚNINA ORMUZ -->
-            <div class="accordion-header" onclick="toggleSection('sect-ormuz', this)">
+            <div class="accordion-header" id="head-sect-ormuz" onclick="toggleSection('sect-ormuz', this)">
                 <span>🔥 Sektor: Cieśnina Ormuz</span><span>[+]</span>
             </div>
             <div class="accordion-content" id="sect-ormuz">
                 <div class="alert-card military">
                     <span class="alert-time">[CRITICAL BLOCKADE]</span>
                     <strong>Zatonięcie jednostek handlowych</strong><br>
-                    Eskalacja wymiany ognia w rejonie cieśniny. Ponad 50 irańskich zbiornikowców objętych całkowitym zakazem ruchu. Akwen patrolowany przez okręty koalicji.
+                    Eskalacja wymiany ognia w rejonie cieśniny. Ponad 50 zbiornikowców objętych całkowitym zakazem ruchu. Akwen patrolowany przez okręty koalicji.
                 </div>
                 <div class="alert-card cargo">
                     <span class="alert-time">[MARKET ALARM]</span>
                     <strong>Ropa Brent osiąga bariery $110</strong><br>
-                    Skok cen surowców energetycznych w odpowiedzi na destabilizację głównych szlaków morskich na Bliskim Wschodzie.
+                    Skok cen surowców energetycznych w odpowiedzi na destabilizację głównych morskich szlaków transportowych.
                 </div>
             </div>
             
             <!-- SEKCJA 3: UKRAINA -->
-            <div class="accordion-header" onclick="toggleSection('sect-ukraine', this)">
+            <div class="accordion-header" id="head-sect-ukraine" onclick="toggleSection('sect-ukraine', this)">
                 <span>🚨 Sektor: Ukraina</span><span>[+]</span>
             </div>
             <div class="accordion-content" id="sect-ukraine">
@@ -111,52 +128,41 @@
                     Uszkodzenia trakcji i opóźnienia w strategicznych transportach logistycznych w zachodniej części kraju.
                 </div>
             </div>
-            
-            <!-- SEKCJA 4: POLSKA -->
-            <div class="accordion-header" onclick="toggleSection('sect-poland', this)">
-                <span>🛡️ Sektor: Krajowy (Polska)</span><span>[+]</span>
-            </div>
-            <div class="accordion-content" id="sect-poland">
-                <div class="alert-card">
-                    <span class="alert-time">[HQ BASE GDYNIA]</span>
-                    <strong>Węzeł Fabryka gotowy</strong><br>
-                    Nasłuch radiowy oraz systemy optoelektroniczne w porcie Gdynia zorientowane na monitoring Morza Bałtyckiego działają bez zakłóceń.
-                </div>
-                <div class="alert-card military">
-                    <span class="alert-time">[MILITARY ALERT]</span>
-                    <strong>Podniesienie gotowości OPL</strong><br>
-                    Polskie oraz sojusznicze myśliwce poderwane w rejonie strefy przygranicznej w związku z rakietową aktywnością w przestrzeni powietrznej Ukrainy.
-                </div>
-            </div>
 
         </div>
     </div>
 
-    <!-- Ekran Radaru i Mapy Wektorowej Zatoki -->
+    <!-- Ekran Mapy Konturowej i Siatki Celowniczej -->
     <div class="radar-screen">
-        <svg class="radar-svg" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="90" fill="none" stroke="#14532d" stroke-width="0.3" />
-            <circle cx="100" cy="100" r="65" fill="none" stroke="#14532d" stroke-width="0.3" />
-            <circle cx="100" cy="100" r="40" fill="none" stroke="#14532d" stroke-width="0.3" />
-            <line x1="10" y1="100" x2="190" y2="100" stroke="#14532d" stroke-width="0.3" />
-            <line x1="100" y1="10" x2="100" y2="190" stroke="#14532d" stroke-width="0.3" />
+        <svg class="radar-svg" viewBox="0 0 900 600">
+            <!-- Linie siatki koordynatów globalnych -->
+            <g class="grid-lines">
+                <line x1="0" y1="150" x2="900" y2="150" />
+                <line x1="0" y1="300" x2="900" y2="300" />
+                <line x1="0" y1="450" x2="900" y2="450" />
+                <line x1="225" y1="0" x2="225" y2="600" />
+                <line x1="450" y1="0" x2="450" y2="600" />
+                <line x1="675" y1="0" x2="675" y2="600" />
+            </g>
+
+            <!-- Uproszczone geometryczne kontury kontynentów świata -->
+            <g class="world-map">
+                <!-- Ameryka Północna -->
+                <polygon points="100,100 280,120 250,280 180,250 150,300 120,250 70,180" />
+                <!-- Ameryka Południowa -->
+                <polygon points="230,310 290,340 260,450 220,550 200,450 210,360" />
+                <!-- Eurazja i Afryka -->
+                <polygon points="400,120 540,100 800,120 850,250 750,350 600,320 500,280 430,220" />
+                <!-- Afryka wyodrębniona -->
+                <polygon points="430,250 510,260 540,350 490,480 440,380 410,300" />
+                <!-- Australia -->
+                <polygon points="720,400 800,420 780,490 710,460" />
+                <!-- Skandynawia / Europa Środkowa zbliżenie wektorowe -->
+                <polygon points="440,130 470,110 480,150 460,180 435,160" />
+            </g>
+
+            <!-- Wiązka skanera radaru -->
+            <line x1="450" y1="300" x2="450" y2="10" class="scanner-beam" />
+
+            <!-- INTERAKTYWNE IKONY SEKTORÓW (Węzły na mapie) -->
             
-            <path d="M 30 110 Q 55 95 65 85 T 75 60 T 95 40 T 130 45" class="coastline" />
-            <line x1="100" y1="100" x2="100" y2="10" class="scanner-beam" />
-            
-            <circle cx="65" cy="85" r="2.5" fill="#10b981" filter="drop-shadow(0 0 3px #10b981)" />
-            <text x="50" y="82" fill="#10b981" font-size="3.5" font-family="sans-serif">GDYNIA BASE</text>
-
-            <g id="radar-ships"></g>
-        </svg>
-    </div>
-
-    <script>
-        // Dane testowe jednostek na Bałtyku
-        const shipsData = [
-            { id: "BAL102", name: "BALTIC CARGO", type: "cargo", cx: 120, cy: 75, dx: 0.2, dy: -0.1 },
-            { id: "ORP271", name: "ORP GENERAL K.", type: "military", cx: 85, cy: 95, dx: -0.1, dy: 0.15 },
-            { id: "TANK88", name: "NORD TANKER", type: "cargo", cx: 140, cy: 110, dx: 0.05, dy: 0.05 }
-        ];
-
-        // Funkcja do chowania całego panelu bocznego
