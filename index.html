@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moja Sieć Fabryka - Panel OSINT & AIS</title>
+    <title>Moja Sieć Fabryka - Panel OSINT Global</title>
     <style>
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05070f; font-family: 'Courier New', monospace; color: #fff; overflow: hidden; display: flex; }
         
@@ -20,32 +20,38 @@
         .scanner-beam { transform-origin: 100px 100px; animation: sweep 7s infinite linear; stroke: #10b981; stroke-width: 1; filter: drop-shadow(0 0 4px #10b981); }
         
         /* Panel boczny OSIRIS z płynną animacją chowania */
-        .dashboard { position: absolute; top: 20px; left: 20px; width: 380px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .dashboard { position: absolute; top: 20px; left: 20px; width: 390px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        .dashboard.hidden { transform: translateX(-420px); opacity: 0; pointer-events: none; }
         
-        /* Klasa dodawana przez JavaScript, gdy menu jest schowane */
-        .dashboard.hidden { transform: translateX(-400px); opacity: 0; pointer-events: none; }
-        
-        /* Hakerski przycisk do zwijania/rozwijania menu */
+        /* Hakerski przycisk główny */
         .menu-toggle { position: absolute; top: 20px; left: 20px; background: #040814; border: 1px solid #10b981; color: #10b981; padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 0.8rem; cursor: pointer; border-radius: 4px; z-index: 11; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-weight: bold; }
         .menu-toggle:hover { background: #10b981; color: #040814; }
         
         h1 { font-size: 1.1rem; margin: 0 40px 5px 0; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
         .subtitle { font-size: 0.7rem; color: #4b5563; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; }
         
-        .alerts-container { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
-        .alert-card { padding: 10px; background: rgba(15, 23, 42, 0.7); border: 1px solid #111827; border-left: 4px solid #38bdf8; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; line-height: 1.4; }
+        /* Kontener na harmonijkę menu */
+        .accordion-container { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
+        .accordion-container::-webkit-scrollbar { width: 4px; }
+        .accordion-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 2px; }
+        
+        /* Styl nagłówków sekcji rozwijanych */
+        .accordion-header { background: #111827; border: 1px solid #1e293b; color: #38bdf8; padding: 10px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-radius: 4px; text-transform: uppercase; }
+        .accordion-header:hover { background: #1f2937; border-color: #10b981; }
+        
+        /* Kontener na treść schowaną */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; margin-bottom: 8px; }
+        .accordion-content.open { max-height: 400px; overflow-y: auto; }
+        
+        /* Karty z alertami */
+        .alert-card { padding: 10px; background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b; border-left: 4px solid #38bdf8; font-size: 0.75rem; border-radius: 4px; margin-bottom: 6px; line-height: 1.4; }
         .alert-card.military { border-left-color: #ef4444; }
         .alert-card.cargo { border-left-color: #f59e0b; }
-        
         .alert-time { font-size: 0.65rem; color: #38bdf8; display: block; margin-bottom: 2px; font-weight: bold; }
         .alert-card.military .alert-time { color: #ef4444; }
         .alert-card.cargo .alert-time { color: #f59e0b; }
-        .alert-geo { font-size: 0.65rem; color: #64748b; display: block; margin-top: 6px; text-align: right; text-transform: uppercase; font-weight: bold; }
         
-        .alerts-container::-webkit-scrollbar { width: 4px; }
-        .alerts-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 2px; }
-        
-        /* Style dla statków i tekstu na radarze */
+        /* Elementy wektorowe radaru */
         .ship { fill: #38bdf8; transition: transform 0.5s linear; filter: drop-shadow(0 0 2px #38bdf8); }
         .ship-label { fill: #94a3b8; font-size: 3px; font-family: sans-serif; font-weight: bold; }
         .coastline { fill: none; stroke: #1e293b; stroke-width: 1.5; stroke-dasharray: 4 2; }
@@ -53,49 +59,102 @@
 </head>
 <body>
 
-    <!-- Przycisk kontrolny (zawsze widoczny) -->
+    <!-- Przycisk główny menu bocznego -->
     <button class="menu-toggle" id="toggle-btn" onclick="toggleMenu()">[ UKRYJ MENU ]</button>
 
     <!-- Panel boczny OSIRIS -->
     <div class="dashboard" id="main-sidebar" style="margin-top: 50px;">
         <h1>Moja Sieć Fabryka</h1>
-        <div class="subtitle">AUTONOMICZNY NASŁUCH AIS: ZATOKA GDAŃSKA</div>
+        <div class="subtitle">KONSOLA OPERACYJNA OSINT Live</div>
         
-        <div class="alerts-container" id="live-ais-list">
-            <!-- Skrypt JS sam wygeneruje listę obiektów AIS na żywo -->
+        <div class="accordion-container">
+            
+            <!-- SEKCOJA 1: ZATOKA GDAŃSKA (Dynamiczna z radaru) -->
+            <div class="accordion-header" onclick="toggleSection('sect-baltic', this)">
+                <span>🌐 Sektor: Zatoka Gdańska (AIS)</span><span>[+]</span>
+            </div>
+            <div class="accordion-content" id="sect-baltic">
+                <div id="live-ais-list"><!-- Generowane automatycznie przez skrypt JS --></div>
+            </div>
+            
+            <!-- SEKCJA 2: CIEŚNINA ORMUZ -->
+            <div class="accordion-header" onclick="toggleSection('sect-ormuz', this)">
+                <span>🔥 Sektor: Cieśnina Ormuz</span><span>[+]</span>
+            </div>
+            <div class="accordion-content" id="sect-ormuz">
+                <div class="alert-card military">
+                    <span class="alert-time">[CRITICAL BLOCADE]</span>
+                    <strong>Zatonięcie jednostek handlowych</strong><br>
+                    Eskalacja wymiany ognia w rejonie cieśniny. Ponad 50 irańskich zbiornikowców objętych całkowitym zakazem ruchu. Akwen patrolowany przez okręty koalicji.
+                </div>
+                <div class="alert-card cargo">
+                    <span class="alert-time">[MARKET ALARM]</span>
+                    <strong>Ropa Brent osiąga bariery $110</strong><br>
+                    Skok cen surowców energetycznych w odpowiedzi na destabilizację głównych szlaków morskich na Bliskim Wschodzie.
+                </div>
+            </div>
+            
+            <!-- SEKCJA 3: UKRAINA -->
+            <div class="accordion-header" onclick="toggleSection('sect-ukraine', this)">
+                <span>🚨 Sektor: Ukraina</span><span>[+]</span>
+            </div>
+            <div class="accordion-content" id="sect-ukraine">
+                <div class="alert-card military">
+                    <span class="alert-time">[COMBAT ALERT]</span>
+                    <strong>Zmasowane uderzenia dronowe</strong><br>
+                    Intensywny ostrzał infrastruktury krytycznej i energetycznej w obwodach charkowskim, kijowskim oraz odeskim. Systemy OPL zgłaszają wysoką aktywność [Ukraine Interactive map - Ukraine Latest news on live map ...].
+                </div>
+                <div class="alert-card">
+                    <span class="alert-time">[LOGISTICS DATA]</span>
+                    <strong>Przerwy w węzłach kolejowych</strong><br>
+                    Uszkodzenia trakcji i opóźnienia w strategicznych transportach logistycznych w zachodniej części kraju.
+                </div>
+            </div>
+            
+            <!-- SEKCJA 4: POLSKA -->
+            <div class="accordion-header" onclick="toggleSection('sect-poland', this)">
+                <span>🛡️ Sektor: Krajowy (Polska)</span><span>[+]</span>
+            </div>
+            <div class="accordion-content" id="sect-poland">
+                <div class="alert-card">
+                    <span class="alert-time">[HQ BASE GDYNIA]</span>
+                    <strong>Węzeł Fabryka gotowy</strong><br>
+                    Nasłuch radiowy oraz systemy optoelektroniczne w porcie Gdynia zorientowane na monitoring Morza Bałtyckiego działają bez zakłóceń.
+                </div>
+                <div class="alert-card warning">
+                    <span class="alert-time">[MILITARY ALERT]</span>
+                    <strong>Podniesienie gotowości OPL</strong><br>
+                    Polskie oraz sojusznicze myśliwce poderwane w rejonie strefy przygranicznej w związku z rakietową aktywnością w przestrzeni powietrznej Ukrainy.
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- Ekran Radaru i Mapy Wektorowej Zatoki -->
     <div class="radar-screen">
         <svg class="radar-svg" viewBox="0 0 200 200">
-            <!-- Siatka celownicza radaru wojskowego -->
             <circle cx="100" cy="100" r="90" fill="none" stroke="#14532d" stroke-width="0.3" />
             <circle cx="100" cy="100" r="65" fill="none" stroke="#14532d" stroke-width="0.3" />
             <circle cx="100" cy="100" r="40" fill="none" stroke="#14532d" stroke-width="0.3" />
             <line x1="10" y1="100" x2="190" y2="100" stroke="#14532d" stroke-width="0.3" />
             <line x1="100" y1="10" x2="100" y2="190" stroke="#14532d" stroke-width="0.3" />
             
-            <!-- Linia brzegowa Zatoki Gdańskiej -->
             <path d="M 30 110 Q 55 95 65 85 T 75 60 T 95 40 T 130 45" class="coastline" />
-            
-            <!-- Wiązka skanująca radaru -->
             <line x1="100" y1="100" x2="100" y2="10" class="scanner-beam" />
             
-            <!-- Punkt bazowy: Fabryka Gdynia -->
             <circle cx="65" cy="85" r="2.5" fill="#10b981" filter="drop-shadow(0 0 3px #10b981)" />
             <text x="50" y="82" fill="#10b981" font-size="3.5" font-family="sans-serif">GDYNIA BASE</text>
 
-            <!-- Dynamiczne obiekty morskich statków na radarze -->
             <g id="radar-ships"></g>
         </svg>
     </div>
 
     <script>
+        // Funkcja do chowania całego panelu bocznego
         function toggleMenu() {
             const sidebar = document.getElementById('main-sidebar');
             const btn = document.getElementById('toggle-btn');
-            
             if (sidebar.classList.contains('hidden')) {
                 sidebar.classList.remove('hidden');
                 btn.innerText = '[ UKRYJ MENU ]';
@@ -105,67 +164,3 @@
             }
         }
 
-        // Prawdziwe typy statków operujące na Zatoce Gdańskiej - zsynchronizowane z tekstem
-        const statki = [
-            { id: "s1", name: "STENA SPIRIT", type: "Prom pasażerski", styleClass: "passenger", color: "#38bdf8", x: 78, y: 72, dx: 0.05, dy: -0.04, speed: "19.5 kn", status: "Kurs na Karlskronę", sector: "Zatoka Zewnętrzna" },
-            { id: "s2", name: "ORP KORMORAN", type: "Okręt wojskowy", styleClass: "military", color: "#ef4444", x: 62, y: 80, dx: 0.03, dy: 0.06, speed: "14.2 kn", status: "Patrol i wyjście z bazy Oksywie", sector: "Rada Gdynia" },
-            { id: "s3", name: "BALTIC WAVE", type: "Tankowiec / Cargo", styleClass: "cargo", color: "#f59e0b", x: 95, y: 105, dx: -0.02, dy: -0.02, speed: "8.7 kn", status: " Podejście do Naftoportu", sector: "Tor wodny Gdańsk" },
-            { id: "s4", name: "ZODIAK II", type: "Jednostka wielozadaniowa", styleClass: "passenger", color: "#38bdf8", x: 105, y: 55, dx: -0.04, dy: 0.03, speed: "10.1 kn", status: "Prace hydrograficzne Urzędu Morskiego", sector: "Rejon Helu" }
-        ];
-
-        function aktualizujRadar() {
-            const containerStatkow = document.getElementById('radar-ships');
-            const containerListy = document.getElementById('live-ais-list');
-            
-            containerStatkow.innerHTML = '';
-            containerListy.innerHTML = '';
-
-            statki.forEach(statek => {
-                // Ruch statków
-                statek.x += statek.dx;
-                statek.y += statek.dy;
-
-                // Zawracanie w granicach radaru
-                if (statek.x < 45 || statek.x > 150) statek.dx *= -1;
-                if (statek.y < 35 || statek.y > 130) statek.dy *= -1;
-
-                // 1. GENEROWANIE KROPKI NA RADARZE (Zsynchronizowane kolory i współrzędne)
-                const g = document.createElementNS("http://w3.org", "g");
-                
-                const circle = document.createElementNS("http://w3.org", "circle");
-                circle.setAttribute("cx", statek.x);
-                circle.setAttribute("cy", statek.y);
-                circle.setAttribute("r", "1.6");
-                circle.setAttribute("class", "ship");
-                circle.setAttribute("style", `fill: ${statek.color}; filter: drop-shadow(0 0 2px ${statek.color});`);
-                
-                const text = document.createElementNS("http://w3.org", "text");
-                text.setAttribute("x", statek.x + 3);
-                text.setAttribute("y", statek.y + 1);
-                text.setAttribute("class", "ship-label");
-                text.setAttribute("style", `fill: ${statek.color}; opacity: 0.8;`);
-                text.textContent = statek.name;
-
-                g.appendChild(circle);
-                g.appendChild(text);
-                containerStatkow.appendChild(g);
-
-                // 2. GENEROWANIE KARTY W PANELU BOCZNYM (Zsynchronizowany tekst z radarem)
-                const card = document.createElement('div');
-                card.className = `alert-card ${statek.styleClass}`;
-                card.innerHTML = `
-                    <span class="alert-time">[AIS REALTIME: ${statek.type.toUpperCase()}]</span>
-                    <strong>${statek.name}</strong><br>
-                    Status:  ${statek.status}<br>
-                    Prędkość: ${statek.speed} | Sektor: ${statek.sector}<br>
-                    <span style="color:#64748b; font-size:9px; font-weight:bold;">COORD XY: [${statek.x.toFixed(1)}, ${statek.y.toFixed(1)}]</span>
-                `;
-                containerListy.appendChild(card);
-            });
-        }
-
-        // Pętla odświeżania radaru
-        setInterval(aktualizujRadar, 150);
-    </script>
-</body>
-</html>
