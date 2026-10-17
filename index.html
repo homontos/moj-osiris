@@ -19,9 +19,17 @@
         }
         .scanner-beam { transform-origin: 100px 100px; animation: sweep 7s infinite linear; stroke: #10b981; stroke-width: 1; filter: drop-shadow(0 0 4px #10b981); }
         
-        /* Panel boczny OSIRIS */
-        .dashboard { position: absolute; top: 20px; left: 20px; width: 360px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; }
-        h1 { font-size: 1.1rem; margin: 0 0 5px 0; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+        /* Panel boczny OSIRIS z płynną animacją chowania (Transition) */
+        .dashboard { position: absolute; top: 20px; left: 20px; width: 360px; background: rgba(4, 8, 20, 0.95); border: 1px solid #10b981; padding: 20px; border-radius: 8px; z-index: 10; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); box-sizing: border-box; transition: transform 0.4s ease, opacity 0.4s ease; }
+        
+        /* Klasa dodawana przez JavaScript, gdy menu jest schowane */
+        .dashboard.hidden { transform: translateX(-380px); opacity: 0; pointer-events: none; }
+        
+        /* Hakerski przycisk do zwijania/rozwijania menu */
+        .menu-toggle { position: absolute; top: 20px; left: 20px; background: #040814; border: 1px solid #10b981; color: #10b981; padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 0.8rem; cursor: pointer; border-radius: 4px; z-index: 11; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-weight: bold; }
+        .menu-toggle:hover { background: #10b981; color: #040814; }
+        
+        h1 { font-size: 1.1rem; margin: 0 40px 5px 0; color: #10b981; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
         .subtitle { font-size: 0.7rem; color: #4b5563; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; }
         
         .alerts-container { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
@@ -38,12 +46,16 @@
 </head>
 <body>
 
-    <div class="dashboard">
+    <!-- Przycisk kontrolny (zawsze widoczny) -->
+    <button class="menu-toggle" id="toggle-btn" onclick="toggleMenu()">[ UKRYJ MENU ]</button>
+
+    <!-- Panel boczny OSIRIS -->
+    <div class="dashboard" id="main-sidebar" style="margin-top: 50px;">
         <h1>Moja Sieć Fabryka</h1>
         <div class="subtitle">AUTONOMICZNY NASŁUCH AIS: ZATOKA GDAŃSKA</div>
         
         <div class="alerts-container" id="live-ais-list">
-            <!-- Tutaj skrypt JS sam wygeneruje listę obiektów AIS na żywo -->
+            <!-- Skrypt JS sam wygeneruje listę obiektów AIS na żywo -->
         </div>
     </div>
 
@@ -57,8 +69,7 @@
             <line x1="10" y1="100" x2="190" y2="100" stroke="#14532d" stroke-width="0.3" />
             <line x1="100" y1="10" x2="100" y2="190" stroke="#14532d" stroke-width="0.3" />
             
-            <!-- Uproszczona linia brzegowa Zatoki Gdańskiej narysowana wektorem -->
-            <!-- Gdynia (około 70,80), Hel (około 90,40), Gdańsk (około 95,130) -->
+            <!-- Uproszczona linia brzegowa Zatoki Gdańskiej -->
             <path d="M 30 110 Q 55 95 65 85 T 75 60 T 95 40 T 130 45" class="coastline" />
             
             <!-- Wiązka skanująca radaru -->
@@ -74,7 +85,21 @@
     </div>
 
     <script>
-        // Dane statków na Zatoce Gdańskiej, które będą symulować ruch w czasie rzeczywistym
+        // Funkcja do rozwijania i zwijania menu bocznego
+        function toggleMenu() {
+            const sidebar = document.getElementById('main-sidebar');
+            const btn = document.getElementById('toggle-btn');
+            
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                btn.innerText = '[ UKRYJ MENU ]';
+            } else {
+                sidebar.classList.add('hidden');
+                btn.innerText = '[ POKAŻ MENU ]';
+            }
+        }
+
+        // Dane statków na Zatoce Gdańskiej
         const statki = [
             { id: "s1", name: "BALTIC OPERATOR", type: "Cargo", x: 75, y: 78, dx: 0.1, dy: -0.05, speed: "12.4 kn", status: "W drodze do Gdyni" },
             { id: "s2", name: "STENA SPIRIT", type: "Prom pasażerski", x: 88, y: 72, dx: -0.08, dy: 0.08, speed: "18.1 kn", status: "Wychodzi z portu" },
@@ -90,15 +115,12 @@
             containerListy.innerHTML = '';
 
             statki.forEach(statek => {
-                // Aktualizacja pozycji statków na mapie radaru
                 statek.x += statek.dx;
                 statek.y += statek.dy;
 
-                // Zawracanie statków jeśli odpłyną za daleko
                 if (statek.x < 40 || statek.x > 160) statek.dx *= -1;
                 if (statek.y < 30 || statek.y > 150) statek.dy *= -1;
 
-                // Rysowanie kropki statku na SVG
                 const g = document.createElementNS("http://w3.org", "g");
                 
                 const circle = document.createElementNS("http://w3.org", "circle");
@@ -118,20 +140,18 @@
                 g.appendChild(text);
                 containerStatkow.appendChild(g);
 
-                // Rysowanie karty informacyjnej statku w lewym panelu bocznym
                 const card = document.createElement('div');
                 card.className = `alert-card ${statek.type === 'Okręt wojskowy' ? 'critical' : ''}`;
                 card.innerHTML = `
                     <span class="alert-time">[AIS OBJECT: ${statek.type.toUpperCase()}]</span>
                     <strong>${statek.name}</strong><br>
                     Prędkość: ${statek.speed} | Status: ${statek.status}<br>
-                    <span style="color:#64748b; font-size:9px;">POS: [${statek.x.toFixed(2)}, ${statek.y.toFixed(2)}]</span>
+                    <span style="color:#4b5563; font-size:9px;">POS: [${statek.x.toFixed(2)}, ${statek.y.toFixed(2)}]</span>
                 `;
                 containerListy.appendChild(card);
             });
         }
 
-        // Pętla odświeżająca pozycje statków na żywo co 100 milisekund (płynny ruch!)
         setInterval(aktualizujRadar, 100);
     </script>
 </body>
