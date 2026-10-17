@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moja Sieć Fabryka</title>
-    <!-- Pobieranie biblioteki Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <script src="https://unpkg.com"></script>
     <style>
-        html, body { margin: 0; padding: 0; width: 100vw; height: 100vh; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0b0f19; font-family: sans-serif; color: #fff; overflow: hidden; }
         
-        /* Wymuszenie widoczności mapy na pełnym ekranie */
-        #map { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; display: block; }
+        /* Czysty, pancerny element iframe rozciągnięty na cały ekran */
+        iframe { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 1; }
         
         /* Panel boczny w stylu OSIRIS */
-        .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 320px; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .dashboard-overlay { position: absolute; top: 20px; left: 20px; width: 320px; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border: 1px solid #1e293b; padding: 20px; border-radius: 12px; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); pointer-events: none; }
         h1 { font-size: 1.2rem; margin: 0 0 10px 0; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
         p { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; }
-        .data-item { padding: 8px 12px; background: rgba(30, 41, 59, 0.6); border-left: 3px solid #38bdf8; font-size: 0.8rem; border-radius: 4px; }
+        .data-item { padding: 8px 12px; background: rgba(30, 41, 59, 0.8); border-left: 3px solid #38bdf8; font-size: 0.8rem; border-radius: 4px; }
     </style>
 </head>
 <body>
 
+    <!-- Panel boczny nakładany na mapę -->
     <div class="dashboard-overlay">
         <h1>Moja Sieć Fabryka</h1>
-        <p>System wizualizacji danych (v2)</p>
+        <p>System wizualizacji danych (v4)</p>
         <div id="custom-points-list">
             <div class="data-item">
                 <strong>Fabryka Gdynia</strong><br>Główny węzeł sieci i punkt dowodzenia.
@@ -32,23 +30,10 @@
         </div>
     </div>
 
-    <!-- Kontener mapy -->
-    <div id="map"></div>
+    <!-- Osadzona, oficjalna mapa OpenStreetMap wycelowana bezpośrednio na Gdynię z markerem -->
+    <iframe 
+        src="https://openstreetmap.org">
+    </iframe>
 
-    <script>
-        // Inicjalizacja mapy Leaflet
-        const map = L.map('map', { zoomControl: false }).setView([54.5189, 18.5305], 12);
-
-        // Stabilne kafelki Dark Matter
-        L.tileLayer('https://{s}://{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        L.control.zoom({ position: 'top-right' }).addTo(map);
-
-        // Dodanie markera
-        const marker = L.marker([54.5189, 18.5305]).addTo(map);
-        marker.bindPopup('<b style="color:#000;">Fabryka Gdynia</b>');
-    </script>
 </body>
 </html>
